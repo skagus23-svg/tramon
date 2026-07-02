@@ -120,7 +120,7 @@ def load_local_sales():
             all_rows.append(df)
         except Exception:
             continue
-    if not all_rows: return pd.DataFrame(columns=['날짜','SKU','수량'])
+    if not all_rows: return pd.DataFrame(columns=['월','SKU','수량'])
     raw = pd.concat(all_rows, ignore_index=True)
     raw['월'] = raw['날짜'].dt.to_period('M')
     return raw.groupby(['월','SKU'])['수량'].sum().reset_index()
@@ -312,8 +312,12 @@ if LOCAL_MODE:
     st.warning("⚠️ 로컬 모드 — 재고 저장 기능은 Supabase 연결 후 활성화됩니다.", icon="🔒")
 
 monthly_raw = load_local_sales()
-monthly_raw['월_dt'] = monthly_raw['월'].apply(lambda x: pd.Period(x, 'M').to_timestamp())
-monthly_raw['월_label'] = monthly_raw['월_dt'].apply(to_short_month)
+if monthly_raw.empty or '월' not in monthly_raw.columns:
+    st.info("📂 판매 데이터가 없습니다. 'Excel 업로드' 탭에서 엑셀 파일을 업로드해주세요.")
+    monthly_raw = pd.DataFrame(columns=['월','SKU','수량','월_dt','월_label'])
+else:
+    monthly_raw['월_dt'] = monthly_raw['월'].apply(lambda x: pd.Period(x, 'M').to_timestamp())
+    monthly_raw['월_label'] = monthly_raw['월_dt'].apply(to_short_month)
 
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["📈 판매 추이", "🔮 수요예측", "📦 재고 관리", "🤖 AI 재고 최적화", "📂 엑셀 업로드"])
 
