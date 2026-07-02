@@ -308,8 +308,6 @@ def make_line_chart(df, x_col, y_col, color_col=None, title=''):
 # 메인 UI
 # ═══════════════════════════════════════════════════════════════
 st.title("🧳 트라몬 캐리어 재고 관리 시스템")
-if LOCAL_MODE:
-    st.warning("⚠️ 로컬 모드 — 재고 저장 기능은 Supabase 연결 후 활성화됩니다.", icon="🔒")
 
 monthly_raw = load_local_sales()
 if monthly_raw.empty or '월' not in monthly_raw.columns:
